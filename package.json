@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/coltonhughes/apexlegends"
   },
   "scripts": {
     "build": "tsc",
@@ -17,7 +17,11 @@
     "lib/**/*"
   ],
   "author": "Colton Hughes",
-  "license": "ISC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/coltonhughes/apexlegends/issues"
+  },
+  "homepage": "https://github.com/coltonhughes/apexlegends",
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/node": "^17.0.38",
