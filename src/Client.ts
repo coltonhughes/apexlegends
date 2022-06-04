@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 const baseURL = 'https://api.mozambiquehe.re/';
 
@@ -7,6 +7,7 @@ const baseURL = 'https://api.mozambiquehe.re/';
  */
 export class Client {
   private headers;
+
   /**
    *
    * @param APIKey
@@ -18,67 +19,89 @@ export class Client {
   /**
    *
    * @param username
-   * @param platform
-   * @returns Promise<ApexStat | AxiosError | any>
+   * @param platform @default Platform.pc
+   * @returns Promise<ApexStat | AxiosError>
    */
-  async getUserStats(username: string, platform: Platform = Platform.pc): Promise<AxiosError | ApexStat | any> {
-    try {
-      const { data }: { data: ApexStat; status: number } = await axios.get(
-        `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(username)}`,
-        this.headers,
+  async getUserStats(
+    username: string,
+    platform: Platform = Platform.pc
+  ): Promise<ApexStat | Error> {
+    const { data, status }: { data: ApexStat; status: number } =
+      await axios.get(
+        `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
+          username
+        )}`,
+        this.headers
       );
+
+    if (status !== 200) {
+      return new Error(`There was an error fetching the stats for ${username}`);
+    } else {
       return data;
-    } catch (error: unknown) {
-      return error;
     }
   }
 
   /**
    *
-   * @returns Promise<ApexCraftingRotation | AxiosError>
+   * @returns Promise<ApexCraftingRotation | Error>
    */
-  async getCrafting(): Promise<ApexCraftingRotation | AxiosError | any> {
-    try {
-      const { data }: { data: ApexCraftingRotation[] } = await axios.get(`${baseURL}/crafting`, this.headers);
+  async getCrafting(): Promise<ApexCraftingRotation | Error | any> {
+    const { data, status }: { data: ApexCraftingRotation[]; status: number } =
+      await axios.get(`${baseURL}/crafting`, this.headers);
+
+    if (status !== 200) {
+      return new Error(`There was an error fetching crafting rotations`);
+    } else {
       return data;
-    } catch (error: unknown) {
-      return error;
     }
   }
 
   /**
    *
-   * @param mode
-   * @param version
-   * @returns Promise<ApexMapRotation | AxiosError>
+   * @param mode @default Modes.br_ranked
+   * @param version @default 1
+   * @returns Promise<ApexMapRotation | Arenas | AxiosError>
    */
-  async getMap(mode: Modes = Modes.br_ranked, version: number = 1): Promise<ApexMapRotation | AxiosError | any> {
-    try {
-      const { data }: { data: ApexMapRotation } = await axios.get(
+  async getMap(
+    mode: Modes = Modes.br_ranked,
+    version: number = 1
+  ): Promise<ApexMapRotation | Arenas | Error> {
+    const { data, status }: { data: ApexMapRotation; status: number } =
+      await axios.get(
         `${baseURL}/maprotation?version=${version}`,
-        this.headers,
+        this.headers
       );
+    if (status !== 200) {
+      return new Error(`There was an issue fetching the map for: ${mode}`);
+    } else {
       if (mode === Modes.all) {
         return data;
       } else {
-        return data[`${mode}`];
+        return data[`${mode}`] as Arenas;
       }
-    } catch (error: unknown) {
-      return error;
     }
   }
 
-  /// TO BE FINISHED AWAITING API APPROVAL
-  async getStore(): Promise<any> {
-    try {
-      const { data }: { data: any } = await axios.get(`${baseURL}/store`, this.headers);
+  /**
+   *
+   * @returns Promise<ApexStore | Error>
+   */
+  async getStore(): Promise<ApexStore | Error> {
+    const { data, status }: { data: ApexStore; status: number } =
+      await axios.get(`${baseURL}/store`, this.headers);
+    if (status !== 200) {
+      return new Error('There was an error fetching the current store items');
+    } else {
       return data;
-    } catch (error: unknown) {
-      return error;
     }
   }
 }
 /// TYPES
+
+export enum StatType {
+  'kills' = 'kills',
+  'kd' = 'kd'
+}
 
 export enum Modes {
   'br' = 'battle_royale',
@@ -86,23 +109,24 @@ export enum Modes {
   'br_ranked' = 'ranked',
   'arenas_ranked' = 'arenasRanked',
   'control' = 'control',
-  'all' = 'all',
+  'all' = 'all'
 }
 
 export enum Platform {
   'pc' = 'PC',
   'xbox' = 'X1',
-  'psn' = 'PS4',
+  'psn' = 'PS4'
 }
 
 // APEX STATS
+
 export interface ApexStat {
   global?: Global;
   realtime?: Realtime;
   legends?: Legends;
   mozambiquehereInternal?: MozambiquehereInternal;
   als?: Als;
-  total?: Total;
+  total?: TotalStat;
 }
 
 export interface Als {
@@ -144,37 +168,37 @@ export interface Battlepass {
   history?: { [key: string]: number };
 }
 
-export interface Legends {
+export interface LegendOrGlobal {
   selected?: Selected;
-  all?: All;
+  all?: Legends;
 }
 
-export interface All {
-  global?: Ash;
-  revenant?: Ash;
-  crypto?: Ash;
-  horizon?: Horizon;
-  gibraltar?: Ash;
-  wattson?: Ash;
-  fuse?: Ash;
-  bangalore?: Ash;
-  wraith?: Ash;
-  octane?: Ash;
-  bloodhound?: Ash;
-  caustic?: Ash;
-  lifeline?: Ash;
-  pathfinder?: Ash;
-  loba?: Ash;
-  mirage?: Ash;
-  rampart?: Ash;
-  valkyrie?: Ash;
-  seer?: Ash;
-  ash?: Ash;
-  madMaggie?: Ash;
-  newcastle?: Ash;
+export interface Legends {
+  global?: LegendAssets;
+  revenant?: LegendAssets;
+  crypto?: LegendAssets;
+  horizon?: LegendAssets;
+  gibraltar?: LegendAssets;
+  wattson?: LegendAssets;
+  fuse?: LegendAssets;
+  bangalore?: LegendAssets;
+  wraith?: LegendAssets;
+  octane?: LegendAssets;
+  bloodhound?: LegendAssets;
+  caustic?: LegendAssets;
+  lifeline?: LegendAssets;
+  pathfinder?: LegendAssets;
+  loba?: LegendAssets;
+  mirage?: LegendAssets;
+  rampart?: LegendAssets;
+  valkyrie?: LegendAssets;
+  seer?: LegendAssets;
+  ash?: LegendAssets;
+  madMaggie?: LegendAssets;
+  newcastle?: LegendAssets;
 }
 
-export interface Ash {
+export interface LegendAssets {
   imgAssets?: ImgAssets;
 }
 
@@ -259,7 +283,7 @@ export interface Realtime {
   currentStateAsText?: string;
 }
 
-export interface Total {
+export interface TotalStat {
   kills?: Kills;
   kd?: Kd;
 }
@@ -302,13 +326,13 @@ export interface ItemType {
 export enum Rarity {
   Common = 'Common',
   Epic = 'Epic',
-  Rare = 'Rare',
+  Rare = 'Rare'
 }
 
 export enum RarityHex {
   'B200FF' = '#B200FF',
   '#0094FF' = '#0094FF',
-  '#808080' = '#808080',
+  '#808080' = '#808080'
 }
 
 export interface ApexCraftingBundle {
@@ -379,5 +403,50 @@ export interface Next {
 }
 
 // END APEX MAPS
+
+// START APEX STORE
+
+export interface ApexStore {
+  title?: string;
+  desc?: Desc;
+  tag?: string;
+  purchaseLimit?: number;
+  isAvailable?: boolean;
+  expireTimestamp?: number;
+  shopType?: ShopType;
+  originalPrice?: number;
+  pricing?: Pricing[];
+  content?: Content[];
+  offerID?: string;
+  asset?: string;
+}
+
+export interface Content {
+  ref?: string;
+  name?: string;
+  quantity?: number;
+}
+
+export enum Desc {
+  Empty = '',
+  Skin = 'Skin'
+}
+
+export interface Pricing {
+  ref?: Currency;
+  quantity?: number;
+}
+
+export enum Currency {
+  ApexCoins = 'Apex Coins',
+  LegendTokens = 'Legend Tokens'
+}
+
+export enum ShopType {
+  Shop = 'shop',
+  Specials = 'specials'
+}
+
+// END APEX STORE
 
 export default Client;
