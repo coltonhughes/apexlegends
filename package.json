@@ -11,9 +11,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier 'src/**/*.ts' --write",
     "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build"
+    "prepare": "npm run lint && npm run format && npm run build"
   },
   "keywords": [],
   "files": [
