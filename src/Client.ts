@@ -25,8 +25,8 @@ export class Client {
   async getUserStats(
     username: string,
     platform: Platform = Platform.pc
-  ): Promise<ApexStatObj | Error> {
-    const { data, status }: { data: ApexStat; status: number } =
+  ): Promise<ApexStatObj | Error | PlayerNotFound> {
+    const { data, status }: { data: ApexStat | any; status: number } =
       await axios.get(
         `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
           username
@@ -37,15 +37,28 @@ export class Client {
     if (status !== 200) {
       return new Error(`There was an error fetching the stats for ${username}`);
     } else {
-      const statObj: ApexStatObj = {
-        name: username,
-        platform,
-        level: data.global.level,
-        toNextLevelPercent: data.global.toNextLevelPercent,
-        kills: data.total.kills.value
-      };
+      try {
+        const statObj: ApexStatObj = {
+          name: username,
+          platform,
+          level: data.global.level,
+          toNextLevelPercent: data.global.toNextLevelPercent,
+          kills: data.total.kills.value,
+          status: StatusEnum.FOUND
+        };
 
-      return statObj;
+        return statObj;
+      } catch (e) {
+        if (e instanceof TypeError) {
+          const notFound: PlayerNotFound = {
+            error: `Player ${username} on ${platform} was not found!`,
+            status: StatusEnum.NOT_FOUND
+          };
+          return notFound;
+        } else {
+          throw new Error('Unexpected error occured!');
+        }
+      }
     }
   }
 
@@ -105,9 +118,17 @@ export class Client {
   }
 }
 
-export default Client;
-
 /// TYPES
+
+export enum StatusEnum {
+  'FOUND' = 'FOUND',
+  'NOT_FOUND' = 'NOT_FOUND'
+}
+
+export interface PlayerNotFound {
+  error: string;
+  status: StatusEnum;
+}
 
 export interface ApexStatObj {
   name: string;
@@ -115,6 +136,7 @@ export interface ApexStatObj {
   level: number;
   toNextLevelPercent: number;
   kills: number;
+  status: StatusEnum;
 }
 
 export enum StatType {
