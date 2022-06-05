@@ -1,6 +1,6 @@
 {
   "name": "@cheem/apexlegends",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A wrapper for http://apexlegendsstatus.com api to fetch stats, map rotations, and more!",
   "main": "dist/index.js",
   "types": "dist/**/**.d.ts",
