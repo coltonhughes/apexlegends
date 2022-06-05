@@ -1,9 +1,9 @@
 {
   "name": "@cheem/apexlegends",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A wrapper for http://apexlegendsstatus.com api to fetch stats, map rotations, and more!",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/**/**.d.ts",
   "type": "commonjs",
   "engines": {
     "npm": ">=8.11.0",
@@ -14,7 +14,8 @@
     "url": "https://github.com/coltonhughes/apexlegends"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
+    "prebuild": "rm -rf ./dist",
+    "build": "npm run prebuild && tsc --project tsconfig.build.json",
     "format": "prettier 'src/**/*.ts' --write",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run lint && npm run format && npm run build",
