@@ -44,6 +44,7 @@ export class Client {
           level: data.global.level,
           toNextLevelPercent: data.global.toNextLevelPercent,
           kills: data.total.kills.value,
+          selectedLegend: data.legends.selected.LegendName,
           status: StatusEnum.FOUND
         };
 
@@ -136,6 +137,7 @@ export interface ApexStatObj {
   level: number;
   toNextLevelPercent: number;
   kills: number;
+  selectedLegend: string;
   status: StatusEnum;
 }
 
