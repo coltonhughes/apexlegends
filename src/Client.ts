@@ -48,6 +48,7 @@ export class Client {
             kills: data.total.kills.value,
             selectedLegend: data.legends.selected.LegendName,
             legendIcon: data.legends.selected.ImgAssets.icon,
+            brRankScore: data.global.rank.rankScore,
             brRankName: data.global.rank.rankName,
             brRankDiv: data.global.rank.rankDiv,
             brRankImg: data.global.rank.rankImg,
@@ -157,6 +158,7 @@ export interface ApexStatObj {
   selectedLegend: string;
   legendIcon: LegendOrGlobal;
   status: StatusEnum;
+  brRankScore: number;
   brRankName: string;
   brRankDiv: string;
   brRankImg: string;
