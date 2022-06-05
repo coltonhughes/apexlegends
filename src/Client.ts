@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const baseURL = 'https://api.mozambiquehe.re/';
 
@@ -25,44 +25,56 @@ export class Client {
   async getUserStats(
     username: string,
     platform: Platform = Platform.pc
-  ): Promise<ApexStatObj | Error | PlayerNotFound> {
-    const { data, status }: { data: ApexStat | any; status: number } =
-      await axios.get(
-        `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
-          username
-        )}`,
-        this.headers
-      );
-
-    if (status !== 200) {
-      return new Error(`There was an error fetching the stats for ${username}`);
-    } else {
-      try {
-        const statObj: ApexStatObj = {
-          name: username,
-          platform,
-          level: data.global.level,
-          toNextLevelPercent: data.global.toNextLevelPercent,
-          kills: data.total.kills.value,
-          selectedLegend: data.legends.selected.LegendName,
-          legendIcon: data.legends.selected.ImgAssets.icon,
-          brRankName: data.global.rank.rankName,
-          brRankDiv: data.global.rank.rankDiv,
-          brRankImg: data.global.rank.rankImg,
-          status: StatusEnum.FOUND
-        };
-
-        return statObj;
-      } catch (e) {
-        if (e instanceof TypeError) {
-          const notFound: PlayerNotFound = {
-            error: `Player ${username} on ${platform} was not found!`,
-            status: StatusEnum.NOT_FOUND
+  ): Promise<ApexStatObj | Error | PlayerNotFound | any> {
+    try {
+      const { data, status }: { data: ApexStat | any; status: number } =
+        await axios.get(
+          `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
+            username
+          )}`,
+          this.headers
+        );
+      if (status !== 200) {
+        return new Error(
+          `There was an error fetching the stats for ${username}`
+        );
+      } else {
+        try {
+          const statObj: ApexStatObj = {
+            name: username,
+            platform,
+            level: data.global.level,
+            toNextLevelPercent: data.global.toNextLevelPercent,
+            kills: data.total.kills.value,
+            selectedLegend: data.legends.selected.LegendName,
+            legendIcon: data.legends.selected.ImgAssets.icon,
+            brRankName: data.global.rank.rankName,
+            brRankDiv: data.global.rank.rankDiv,
+            brRankImg: data.global.rank.rankImg,
+            status: StatusEnum.FOUND
           };
-          return notFound;
-        } else {
-          throw new Error('Unexpected error occured!');
+
+          return statObj;
+        } catch (e) {
+          if (e instanceof TypeError) {
+            const notFound: PlayerNotFound = {
+              error: `Player ${username} on ${platform} was not found!`,
+              status: StatusEnum.NOT_FOUND
+            };
+            return notFound;
+          } else {
+            console.log(e);
+            throw new Error('Unexpected error occured!');
+          }
         }
+      }
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const noApexData: PlayerNotFound = {
+          error: `Player ${username} on ${platform} exists, but has no Apex data!`,
+          status: StatusEnum.NO_DATA
+        };
+        return noApexData;
       }
     }
   }
@@ -127,7 +139,8 @@ export class Client {
 
 export enum StatusEnum {
   'FOUND' = 'FOUND',
-  'NOT_FOUND' = 'NOT_FOUND'
+  'NOT_FOUND' = 'NOT_FOUND',
+  'NO_DATA' = 'NO_DATA'
 }
 
 export interface PlayerNotFound {
