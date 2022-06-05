@@ -45,6 +45,7 @@ export class Client {
           toNextLevelPercent: data.global.toNextLevelPercent,
           kills: data.total.kills.value,
           selectedLegend: data.legends.selected.LegendName,
+          legendIcon: data.legends.selected.ImgAssets.icon,
           status: StatusEnum.FOUND
         };
 
@@ -138,6 +139,7 @@ export interface ApexStatObj {
   toNextLevelPercent: number;
   kills: number;
   selectedLegend: string;
+  legendIcon: LegendOrGlobal;
   status: StatusEnum;
 }
 
