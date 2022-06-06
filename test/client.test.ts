@@ -22,13 +22,6 @@ describe('Apex API Tests', () => {
     });
   });
 
-  it('Lookup crafting', (done) => {
-    ApexAPI.getCrafting().then((res) => {
-      assert.equal(typeof res, 'object');
-      done();
-    });
-  });
-
   it('Lookup map rotation', (done) => {
     ApexAPI.getMap().then((res) => {
       assert.equal(typeof res, 'object');
