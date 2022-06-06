@@ -4,7 +4,7 @@
     <img alt="Version" src="https://img.shields.io/npm/v/@cheem/apexlegends.svg">
   </a>
   <img src="https://img.shields.io/badge/npm-%3E%3D8.11.0-blue.svg" />
-  <img src="https://img.shields.io/badge/node-%3E18.2.0-blue.svg" />
+  <img src="https://img.shields.io/node/v/@cheem/apexlegends" />
   <a href="https://github.com/coltonhughes/apexlegends#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
@@ -20,7 +20,7 @@
 ## Prerequisites
 
 - npm >=8.11.0
-- node >18.2.0
+- node >=18.2.0
 
 ## Install
 

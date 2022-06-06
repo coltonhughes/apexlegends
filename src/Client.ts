@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const baseURL = 'https://api.mozambiquehe.re/';
 
@@ -7,7 +7,6 @@ const baseURL = 'https://api.mozambiquehe.re/';
  */
 export class Client {
   private headers;
-
   /**
    *
    * @param APIKey
@@ -22,22 +21,62 @@ export class Client {
    * @param platform @default Platform.pc
    * @returns Promise<ApexStat | AxiosError>
    */
+
   async getUserStats(
     username: string,
     platform: Platform = Platform.pc
-  ): Promise<ApexStat | Error> {
-    const { data, status }: { data: ApexStat; status: number } =
-      await axios.get(
-        `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
-          username
-        )}`,
-        this.headers
-      );
+  ): Promise<ApexStatObj | Error | PlayerNotFound | any> {
+    try {
+      const { data, status }: { data: ApexStat | any; status: number } =
+        await axios.get(
+          `${baseURL}/bridge?platform=${platform}&player=${encodeURIComponent(
+            username
+          )}`,
+          this.headers
+        );
+      if (status !== 200) {
+        return new Error(
+          `There was an error fetching the stats for ${username}`
+        );
+      } else {
+        try {
+          const statObj: ApexStatObj = {
+            name: username,
+            platform,
+            level: data.global.level,
+            toNextLevelPercent: data.global.toNextLevelPercent,
+            kills: data.total.kills.value,
+            selectedLegend: data.legends.selected.LegendName,
+            legendIcon: data.legends.selected.ImgAssets.icon,
+            brRankScore: data.global.rank.rankScore,
+            brRankName: data.global.rank.rankName,
+            brRankDiv: data.global.rank.rankDiv,
+            brRankImg: data.global.rank.rankImg,
+            status: StatusEnum.FOUND
+          };
 
-    if (status !== 200) {
-      return new Error(`There was an error fetching the stats for ${username}`);
-    } else {
-      return data;
+          return statObj;
+        } catch (e) {
+          if (e instanceof TypeError) {
+            const notFound: PlayerNotFound = {
+              error: `Player ${username} on ${platform} was not found!`,
+              status: StatusEnum.NOT_FOUND
+            };
+            return notFound;
+          } else {
+            console.log(e);
+            throw new Error('Unexpected error occured!');
+          }
+        }
+      }
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const noApexData: PlayerNotFound = {
+          error: `Player ${username} on ${platform} exists, but has no Apex data!`,
+          status: StatusEnum.NO_DATA
+        };
+        return noApexData;
+      }
     }
   }
 
@@ -96,7 +135,34 @@ export class Client {
     }
   }
 }
+
 /// TYPES
+
+export enum StatusEnum {
+  'FOUND' = 'FOUND',
+  'NOT_FOUND' = 'NOT_FOUND',
+  'NO_DATA' = 'NO_DATA'
+}
+
+export interface PlayerNotFound {
+  error: string;
+  status: StatusEnum;
+}
+
+export interface ApexStatObj {
+  name: string;
+  platform: Platform;
+  level: number;
+  toNextLevelPercent: number;
+  kills: number;
+  selectedLegend: string;
+  legendIcon: LegendOrGlobal;
+  status: StatusEnum;
+  brRankScore: number;
+  brRankName: string;
+  brRankDiv: string;
+  brRankImg: string;
+}
 
 export enum StatType {
   'kills' = 'kills',
@@ -121,12 +187,12 @@ export enum Platform {
 // APEX STATS
 
 export interface ApexStat {
-  global?: Global;
+  global: Global;
   realtime?: Realtime;
   legends?: Legends;
   mozambiquehereInternal?: MozambiquehereInternal;
   als?: Als;
-  total?: TotalStat;
+  total: TotalStat;
 }
 
 export interface Als {
@@ -134,18 +200,18 @@ export interface Als {
 }
 
 export interface Global {
-  name?: string;
-  uid?: number;
-  avatar?: string;
-  platform?: string;
-  level?: number;
-  toNextLevelPercent?: number;
-  internalUpdateCount?: number;
-  bans?: Bans;
-  rank?: Arena;
-  arena?: Arena;
-  battlepass?: Battlepass;
-  badges?: null;
+  name: string;
+  uid: number;
+  avatar: string;
+  platform: string;
+  level: number;
+  toNextLevelPercent: number;
+  internalUpdateCount: number;
+  bans: Bans;
+  rank: Arena;
+  arena: Arena;
+  battlepass: Battlepass;
+  badges: null;
 }
 
 export interface Arena {
@@ -284,7 +350,7 @@ export interface Realtime {
 }
 
 export interface TotalStat {
-  kills?: Kills;
+  kills: Kills;
   kd?: Kd;
 }
 
@@ -294,8 +360,8 @@ export interface Kd {
 }
 
 export interface Kills {
-  name?: string;
-  value?: number;
+  name: string;
+  value: number;
 }
 // END APEX STATS
 
@@ -448,5 +514,3 @@ export enum ShopType {
 }
 
 // END APEX STORE
-
-export default Client;
