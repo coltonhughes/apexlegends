@@ -19,7 +19,7 @@
     "format": "prettier 'src/**/*.ts' --write",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run lint && npm run format && npm run build",
-    "test": "DOTENV_CONFIG_PATH=test.env mocha --require dotenv/config --require ts-node/register 'test/**/*.test.ts' --timeout 5000"
+    "test": "mocha --require ts-node/register 'test/**/*.test.ts' --timeout 5000"
   },
   "keywords": [],
   "files": [
