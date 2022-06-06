@@ -13,7 +13,7 @@
   </a>
 </p>
 
-> Apex Legends API Wrapper for https://apexlegendsapi.com
+> Apex Legends API Wrapper for https://apexlegendsstatus.com
 
 ### 🏠 [Homepage](https://github.com/coltonhughes/apexlegends)
 
