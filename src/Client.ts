@@ -5,7 +5,7 @@ const baseURL = 'https://api.mozambiquehe.re/';
 /**
  * @class
  */
-export class Client {
+export default class Client {
   private headers;
   /**
    *
