@@ -11,6 +11,9 @@
   <a href="https://github.com/coltonhughes/apexlegends/graphs/commit-activity" target="_blank">
     <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
   </a>
+  <a href="https://github.com/coltonhughes/apexlegends/actions/workflows/node.js.yml" target ="_blank">
+    <img alt="ci" src="https://github.com/coltonhughes/apexlegends/actions/workflows/node.js.yml/badge.svg" />
+  </a>
 </p>
 
 > Apex Legends API Wrapper for https://apexlegendsstatus.com
