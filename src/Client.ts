@@ -5,7 +5,7 @@ const baseURL = 'https://api.mozambiquehe.re/';
 /**
  * @class
  */
-export default class Client {
+export class Client {
   private headers;
   /**
    *
@@ -136,6 +136,7 @@ export default class Client {
   }
 }
 
+export default Client;
 /// TYPES
 
 export enum StatusEnum {
