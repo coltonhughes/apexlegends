@@ -1,8 +1,9 @@
 name: Dependabot auto-approve
-on: pull_request
+on: pull_request_target
 
 permissions:
   pull-requests: write
+  contents: write
 
 jobs:
   dependabot:
@@ -10,12 +11,18 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
-        id: metadata
+        id: dependabot-metadata
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Approve pull request
         run: gh pr review --approve "$PR_URL"
         env:
-          PR_URL: ${{ github.event.pull_requests.html_url }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Auto merge if tests pass
+        if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
